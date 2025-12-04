@@ -1,19 +1,49 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { COMPANY_INFO } from '../constants';
+import { Upload } from 'lucide-react';
 
 const Hero: React.FC = () => {
+  const [heroImage, setHeroImage] = useState("https://picsum.photos/id/1056/1920/1080");
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          setHeroImage(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
-    <section className="relative h-[85vh] w-full overflow-hidden">
+    <section className="relative h-[85vh] w-full overflow-hidden group">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img 
-          src="https://picsum.photos/id/1056/1920/1080" 
+          src={heroImage} 
           alt="Luxury Living Room Interior" 
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transition-transform duration-1000"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-neutral-900/80 to-neutral-900/30"></div>
       </div>
+
+      {/* Upload Button */}
+      <label 
+        className="absolute top-24 right-4 md:top-28 md:right-8 z-30 bg-white/20 hover:bg-white/90 text-white hover:text-neutral-900 p-3 rounded-full cursor-pointer backdrop-blur-md transition-all opacity-0 group-hover:opacity-100 shadow-xl"
+        title="Change Hero Image"
+      >
+        <Upload size={20} />
+        <input 
+          type="file" 
+          accept="image/*" 
+          className="hidden" 
+          onChange={handleImageUpload}
+        />
+      </label>
 
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 md:px-8 h-full flex flex-col justify-center">

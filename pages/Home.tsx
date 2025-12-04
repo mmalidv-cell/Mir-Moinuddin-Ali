@@ -1,11 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Hero from '../components/Hero';
 import ServiceCard from '../components/ServiceCard';
 import { SERVICES, TESTIMONIALS, COMPANY_INFO } from '../constants';
-import { Star, Truck, ShieldCheck, Ruler, Clock, MessageCircle } from 'lucide-react';
+import { Star, Truck, ShieldCheck, Ruler, Clock, MessageCircle, Upload } from 'lucide-react';
 
 const Home: React.FC = () => {
+  // State for Featured Projects images
+  const [featuredImages, setFeaturedImages] = useState({
+    main: "https://picsum.photos/id/1070/1200/800",
+    sub1: "https://picsum.photos/id/129/600/400",
+    sub2: "https://picsum.photos/id/133/600/400"
+  });
+
+  // State for Services (Our Expertise) images
+  const [services, setServices] = useState(SERVICES);
+
+  const handleFileUpload = (key: keyof typeof featuredImages) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          setFeaturedImages(prev => ({ ...prev, [key]: reader.result as string }));
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+    e.target.value = ''; // Reset to allow re-uploading same file
+  };
+
+  const handleServiceImageUpdate = (id: string, newUrl: string) => {
+    setServices(prev => prev.map(service => 
+      service.id === id ? { ...service, image: newUrl } : service
+    ));
+  };
+
   return (
     <div>
       <Hero />
@@ -21,8 +51,12 @@ const Home: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {SERVICES.map((service) => (
-              <ServiceCard key={service.id} service={service} />
+            {services.map((service) => (
+              <ServiceCard 
+                key={service.id} 
+                service={service} 
+                onImageUpdate={handleServiceImageUpdate}
+              />
             ))}
           </div>
         </div>
@@ -42,21 +76,50 @@ const Home: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[600px] md:h-[500px]">
+            {/* Main Featured Image */}
             <div className="md:col-span-2 h-full relative group rounded-2xl overflow-hidden cursor-pointer">
-               <img src="https://picsum.photos/id/1070/1200/800" alt="Master Bedroom" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+               <img src={featuredImages.main} alt="Master Bedroom" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-8 opacity-0 group-hover:opacity-100 transition-opacity">
                  <h3 className="text-white text-2xl font-serif font-bold">Modern Living Room</h3>
                  <p className="text-neutral-300">Custom Drapery & Wall Paneling</p>
                </div>
+               <label 
+                  className="absolute top-4 right-4 bg-white/90 text-neutral-700 hover:text-primary p-2 rounded-full shadow-lg backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all z-20 cursor-pointer"
+                  onClick={(e) => e.stopPropagation()}
+                  title="Replace Image"
+               >
+                  <Upload size={20} />
+                  <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload('main')} />
+               </label>
             </div>
+            
             <div className="grid grid-rows-2 gap-6 h-full">
+              {/* Sub Image 1 */}
               <div className="relative group rounded-2xl overflow-hidden cursor-pointer">
-                <img src="https://picsum.photos/id/129/600/400" alt="Kitchen Blinds" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                <img src={featuredImages.sub1} alt="Kitchen Blinds" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors"></div>
+                <label 
+                  className="absolute top-4 right-4 bg-white/90 text-neutral-700 hover:text-primary p-2 rounded-full shadow-lg backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all z-20 cursor-pointer"
+                  onClick={(e) => e.stopPropagation()}
+                  title="Replace Image"
+               >
+                  <Upload size={18} />
+                  <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload('sub1')} />
+               </label>
               </div>
+              
+              {/* Sub Image 2 */}
               <div className="relative group rounded-2xl overflow-hidden cursor-pointer">
-                <img src="https://picsum.photos/id/133/600/400" alt="Wooden Flooring" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                <img src={featuredImages.sub2} alt="Wooden Flooring" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors"></div>
+                <label 
+                  className="absolute top-4 right-4 bg-white/90 text-neutral-700 hover:text-primary p-2 rounded-full shadow-lg backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all z-20 cursor-pointer"
+                  onClick={(e) => e.stopPropagation()}
+                  title="Replace Image"
+               >
+                  <Upload size={18} />
+                  <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload('sub2')} />
+               </label>
               </div>
             </div>
           </div>
